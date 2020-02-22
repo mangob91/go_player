@@ -2,12 +2,12 @@ import copy
 from gotypes import Player
 
 
-class Move():
+class Move:
     def __init__(
-        self,
-        point=None,
-        is_pass=False,
-        is_resign=False
+            self,
+            point=None,
+            is_pass=False,
+            is_resign=False
     ):
         assert (point is not None) ^ is_pass ^ is_resign
         self.point = point
@@ -26,3 +26,45 @@ class Move():
     @classmethod
     def resign(cls):
         return Move(is_resign=True)
+
+
+class GoString:
+    def __init__(
+            self,
+            color,
+            stones,
+            liberties
+    ):
+        """
+        :param color: Enum
+        :param stones: Point
+        :param liberties: Point
+        """
+        self.color = color
+        self.stones = set(stones)
+        self.liberties = set(liberties)
+
+    def remove_liberty(self, point):
+        self.liberties.remove(point)
+
+    def add_liberty(self, point):
+        self.liberties.add(point)
+
+    def merged_with(self, go_string):
+        assert go_string.color == self.color
+        combined_stones = self.stones | go_string.stones
+        return GoString(
+            self.color,
+            combined_stones,
+            (self.liberties | go_string.liberties) - combined_stones
+        )
+
+    @property
+    def num_liberties(self):
+        return len(self.liberties)
+
+    def __eq__(self, other):
+        return isinstance(other, GoString) and \
+               self.color == other.color and \
+               self.stones == other.stones and \
+               self.liberties == other.liberties

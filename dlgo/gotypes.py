@@ -13,6 +13,9 @@ class Player(enum.Enum):
 
 class Point(namedtuple('Point', 'row col')):
     def neighbors(self):
+        """
+        :return: Four Point object of neighbors of current Point
+        """
         return [
             Point(self.row - 1, self.col),
             Point(self.row + 1, self.col),
