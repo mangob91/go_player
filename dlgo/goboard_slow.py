@@ -1,9 +1,9 @@
 import copy
-from gotypes import Player
-from dlgo.gotypes import Point
+from dlgo.gotypes import Player
 
 
 class Move:
+    """Class representing 3 types of moves in Go 'play', 'pass turn', 'resign'"""
     def __init__(
             self,
             point=None,
@@ -30,6 +30,7 @@ class Move:
 
 
 class GoString:
+    """GoString is to efficiently keep track of liberty status of group of same colored stones"""
     def __init__(
             self,
             color,
@@ -53,6 +54,7 @@ class GoString:
 
     def merged_with(self, go_string):
         assert go_string.color == self.color
+        """set | set combines two sets into one"""
         combined_stones = self.stones | go_string.stones
         return GoString(
             self.color,
@@ -72,6 +74,7 @@ class GoString:
 
 
 class Board:
+    """Board class represents Board in Go and is responsible for the logic of placing and capturing stones"""
     def __init__(self, num_rows, num_cols):
         self.num_rows = num_rows
         self.num_cols = num_cols
@@ -166,7 +169,14 @@ class GameState:
             next_board.place_stone(self.next_player, move.point)
         else:
             next_board = self.board
-        return GameState(next_board, self.next_player, self, move)
+        return GameState(next_board, self.next_player.other, self, move)
+
+    @classmethod
+    def new_game(cls, board_size):
+        if isinstance(board_size, int):
+            board_size = (board_size, board_size)
+        board = Board(*board_size)
+        return GameState(board, Player.black, None, None)
 
     def is_over(self):
         if self.last_move is None:
